@@ -57,7 +57,7 @@ public class CouchDBDataStoreTest extends CouchDBTestSupport {
     @BeforeClass
     public static void setUpClass() throws Exception {
         CouchDBConnectionTest test = new CouchDBConnectionTest();
-        test.setUp();
+        test.before();
         db = test.setupDB();
     }
 
@@ -71,8 +71,8 @@ public class CouchDBDataStoreTest extends CouchDBTestSupport {
     @Before
     public void setup() throws Exception {
         store = new CouchDBDataStore();
-        store.setCouchURL(TEST_HOST); // @todo fixture location, etc.
-        store.setDatabaseName(TEST_DB_NAME);
+        store.setCouchURL(getTestHost()); // @todo fixture location, etc.
+        store.setDatabaseName(getTestDB());
     }
     
     @After
@@ -112,7 +112,6 @@ public class CouchDBDataStoreTest extends CouchDBTestSupport {
         int cnt = 0;
         for (Iterator it = c.iterator(); it.hasNext();) {
             Object o = it.next();
-            System.out.println(o);
             cnt++;
         }
         return cnt;

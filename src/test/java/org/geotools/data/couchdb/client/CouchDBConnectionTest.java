@@ -16,11 +16,6 @@
  */
 package org.geotools.data.couchdb.client;
 
-import org.geotools.data.couchdb.client.CouchDBConnection;
-import org.geotools.data.couchdb.client.CouchDBException;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -32,8 +27,8 @@ public class CouchDBConnectionTest extends CouchDBTestSupport {
 
     @Test
     public void testPutDesignDocument() throws Exception {
-        deleteIfExists(TEST_DB_NAME);
-        CouchDBConnection db = client.createDB(TEST_DB_NAME);
+        deleteIfExists(getTestDB());
+        CouchDBConnection db = client.createDB(getTestDB());
 
         // failure first
         try {
@@ -59,8 +54,8 @@ public class CouchDBConnectionTest extends CouchDBTestSupport {
     
 
     public CouchDBConnection setupDB() throws Exception {
-        deleteIfExists(TEST_DB_NAME);
-        CouchDBConnection db = client.createDB(TEST_DB_NAME);
+        deleteIfExists(getTestDB());
+        CouchDBConnection db = client.createDB(getTestDB());
         db.putDesignDocument(resolveFile("design-doc.json"));
 
         db.postBulk(loadJSON("counties.json", null));

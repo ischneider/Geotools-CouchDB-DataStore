@@ -16,6 +16,7 @@
  */
 package org.geotools.data.couchdb.client;
 
+import java.util.Properties;
 import org.geotools.data.couchdb.client.CouchDBUtils;
 import org.geotools.data.couchdb.client.CouchDBClient;
 import org.json.simple.JSONArray;
@@ -27,6 +28,7 @@ import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotools.test.OnlineTestSupport;
 import org.geotools.util.logging.Logging;
 import org.json.simple.JSONValue;
 import org.junit.After;
@@ -37,15 +39,15 @@ import static org.junit.Assert.*;
  *
  * @author Ian Schneider
  */
-public class CouchDBTestSupport {
+public class CouchDBTestSupport extends OnlineTestSupport {
     protected CouchDBClient client;
-    protected String TEST_DB_NAME = "gttestdb";
-    protected String TEST_HOST = "http://127.0.0.1:5984/";
     protected Logger logger;
-
-    @Before
-    public void setUp() throws Exception {
-        client = new CouchDBClient(TEST_HOST);
+    
+    protected final String getTestDB() {
+        return getFixture().getProperty("dbname");
+    }
+    protected final String getTestHost() {
+        return getFixture().getProperty("url");
     }
     
     @After
@@ -53,7 +55,7 @@ public class CouchDBTestSupport {
         debug(false);
     }
     
-    public void debug(boolean on) {
+    protected void debug(boolean on) {
         logger = Logging.getLogger(getClass());
         logger.setLevel(Level.FINEST);
         Logger.getLogger("").getHandlers()[0].setLevel(on ? Level.FINEST : Level.INFO);
@@ -88,4 +90,23 @@ public class CouchDBTestSupport {
         }
         assertTrue("Expected db to be deleted", client.getDatabaseNames().indexOf(db) < 0);
     }
+
+    @Override
+    protected String getFixtureId() {
+        return "couchdb";
+    }
+
+    @Override
+    protected Properties createExampleFixture() {
+        Properties props = new Properties();
+        props.put("url", "http://localhost:5984");
+        props.put("dbname", "gttestdb");
+        return props;
+    }
+
+    @Override
+    protected void connect() throws Exception {
+        client = new CouchDBClient(getTestHost());
+    }
+    
 }

@@ -16,15 +16,7 @@
  */
 package org.geotools.data.couchdb.client;
 
-import org.geotools.data.couchdb.client.CouchDBConnection;
-import org.geotools.data.couchdb.client.CouchDBException;
-import org.junit.After;
 import org.junit.Before;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -37,7 +29,7 @@ public class CouchDBClientTest extends CouchDBTestSupport {
 
     @Before
     public void setup() throws Exception {
-        deleteIfExists(TEST_DB_NAME);
+        deleteIfExists(getTestDB());
     }
     /**
      * Test of getDatabaseNames method, of class CouchDBClient.
@@ -51,8 +43,8 @@ public class CouchDBClientTest extends CouchDBTestSupport {
     @Test
     public void testOpenDBConnection() throws Exception {
         // success path
-        CouchDBConnection db = client.createDB(TEST_DB_NAME);
-        assertEquals(TEST_DB_NAME, client.openDBConnection(TEST_DB_NAME).getName());
+        CouchDBConnection db = client.createDB(getTestDB());
+        assertEquals(getTestDB(), client.openDBConnection(getTestDB()).getName());
         db.delete();
 
         // failure
@@ -66,8 +58,8 @@ public class CouchDBClientTest extends CouchDBTestSupport {
 
     @Test
     public void testCreateDB() throws Exception {
-        CouchDBConnection db = client.createDB(TEST_DB_NAME);
-        assertEquals(TEST_DB_NAME, db.getName());
+        CouchDBConnection db = client.createDB(getTestDB());
+        assertEquals(getTestDB(), db.getName());
         db.delete();
     }
     
