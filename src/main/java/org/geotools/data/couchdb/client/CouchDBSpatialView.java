@@ -2,7 +2,7 @@
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
  *
- *    (C) 2004-2010, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2004-2011, Open Source Geospatial Foundation (OSGeo)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -30,15 +30,15 @@ public class CouchDBSpatialView extends CouchDBViewSupport {
         super(client, connection, path);
     }
     
-    private NameValuePair bbox(float llx,float lly,float urx,float ury) {
+    private NameValuePair bbox(double llx,double lly,double urx,double ury) {
         return new NameValuePair("bbox",llx + "," + lly + "," + urx + "," + ury);
     }
     
-    public JSONObject get(float llx,float lly,float urx,float ury) throws IOException, CouchDBException {
+    public JSONObject get(double llx,double lly,double urx,double ury) throws IOException, CouchDBException {
         return get(bbox(llx, lly, urx, ury));
     }
     
-    public long count(float llx,float lly,float urx,float ury) throws IOException, CouchDBException {
+    public long count(double llx,double lly,double urx,double ury) throws IOException, CouchDBException {
         JSONObject count = get(bbox(llx, lly, urx, ury),new NameValuePair("count","true"));
         return (Long) count.get("count");
     }

@@ -24,10 +24,13 @@ import org.geotools.data.store.ContentFeatureCollection;
 import org.junit.After;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
+import java.util.Iterator;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.Query;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.data.store.ContentFeatureStore;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.filter.Filter;
 import org.geotools.geojson.feature.FeatureJSON;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -37,10 +40,11 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.opengis.feature.Feature;
-import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.Name;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.spatial.BBOX;
 
 /**
  *
@@ -60,15 +64,15 @@ public class CouchDBDataStoreTest extends CouchDBTestSupport {
     @AfterClass
     public static void tearDownClass() throws Exception {
         if (db != null) {
-            //db.delete();
+            db.delete();
         }
     }
     
     @Before
     public void setup() throws Exception {
         store = new CouchDBDataStore();
-        store.setCouchURL("http://127.0.0.1:5984/"); // @todo fixture location, etc.
-        store.setDatabaseName("gttestdb");
+        store.setCouchURL(TEST_HOST); // @todo fixture location, etc.
+        store.setDatabaseName(TEST_DB_NAME);
     }
     
     @After
@@ -103,6 +107,48 @@ public class CouchDBDataStoreTest extends CouchDBTestSupport {
         assertEquals(24, cnt);
     }
     
+    private int count(ContentFeatureCollection c) {
+        // count by forcing reads
+        int cnt = 0;
+        for (Iterator it = c.iterator(); it.hasNext();) {
+            Object o = it.next();
+            System.out.println(o);
+            cnt++;
+        }
+        return cnt;
+    }
+    
+    @Test
+    public void testBBoxQuery() throws Exception {
+        ContentFeatureSource featureSource = store.getFeatureSource("gttestdb.counties");
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        // pueblo county
+        BBOX bbox = ff.bbox("geometry", -105.050678,37.734704,-104.053921,38.522548,null);
+        
+        Query query = new Query("geometry", bbox);
+        assertEquals(1, featureSource.getCount(query));
+        
+        FeatureReader<SimpleFeatureType, SimpleFeature> reader = featureSource.getReader(query);
+        int cnt = 0;
+        while (reader.hasNext()) {
+            SimpleFeature nf = reader.next();
+            cnt++;
+        }
+        assertEquals(1, cnt);
+        
+        ContentFeatureCollection features = featureSource.getFeatures(query);
+        assertEquals(1, count(features));
+    }
+    
+    @Test
+    public void testFilter() throws Exception {
+        ContentFeatureSource featureSource = store.getFeatureSource("gttestdb.counties");
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        PropertyIsEqualTo isPueblo = ff.equal(ff.property("Name"),ff.literal("Pueblo"),true);
+        ContentFeatureCollection features = featureSource.getFeatures(isPueblo);
+        assertEquals(1, count(features));
+    }
+
     @Test
     public void testFeatureWriterAdd() throws Exception {
         // currently require some data to exist due to construction of featuretype from existing feature...

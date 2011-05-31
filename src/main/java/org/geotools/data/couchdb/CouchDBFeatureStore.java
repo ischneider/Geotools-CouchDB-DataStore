@@ -16,31 +16,23 @@
  */
 package org.geotools.data.couchdb;
 
+import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.data.couchdb.client.CouchDBUtils;
 import org.geotools.data.couchdb.client.CouchDBSpatialView;
 import org.geotools.data.couchdb.client.CouchDBException;
 import org.geotools.data.couchdb.client.CouchDBView;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 import java.io.IOException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureStore;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.filter.visitor.ExtractBoundsFilterVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  *
@@ -64,6 +56,7 @@ public class CouchDBFeatureStore extends ContentFeatureStore {
         
         // there appears to be no way to obtain the bbox from couch documents 
         // (aka features) without getting all the geometry as well.
+        // one approach might be to write a view that only returns bbox?
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -77,15 +70,23 @@ public class CouchDBFeatureStore extends ContentFeatureStore {
     }
     
     private CouchDBView dataView() {
-        String spatialView = getEntry().getName().getLocalPart();
         return getDataStore().getConnection().view(viewName);
+    }
+    
+    private Envelope getBBox(Query query) {
+        Envelope envelope = (Envelope) query.getFilter().accept(ExtractBoundsFilterVisitor.BOUNDS_VISITOR, null);
+        if (envelope == null || envelope.isNull() || Double.isInfinite(envelope.getArea())) {
+            envelope = new Envelope(-180, 180, -90, 90);
+        }
+        return envelope;
     }
 
     @Override
     protected int getCountInternal(Query query) throws IOException {
         // @todo ianschneider understand query
+        Envelope e = getBBox(query);
         try {
-            return (int) spatialView().count(-180, -90, 180, 90);
+            return (int) spatialView().count(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
         } catch (CouchDBException ex) {
             throw ex.wrap();
         }
@@ -95,8 +96,9 @@ public class CouchDBFeatureStore extends ContentFeatureStore {
     protected FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(Query query) throws IOException {
         // @todo ianschneider understand query
         JSONObject features;
+        Envelope e = getBBox(query);
         try {
-            features = spatialView().get(-180, -90, 180, 90);
+            features = spatialView().get(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
         } catch (CouchDBException ex) {
             throw ex.wrap();
         }

@@ -40,11 +40,12 @@ import static org.junit.Assert.*;
 public class CouchDBTestSupport {
     protected CouchDBClient client;
     protected String TEST_DB_NAME = "gttestdb";
+    protected String TEST_HOST = "http://127.0.0.1:5984/";
     protected Logger logger;
 
     @Before
     public void setUp() throws Exception {
-        client = new CouchDBClient("http://127.0.0.1:5984/");
+        client = new CouchDBClient(TEST_HOST);
     }
     
     @After
@@ -78,10 +79,6 @@ public class CouchDBTestSupport {
     
     protected String resolveContent(String path) throws FileNotFoundException {
         return CouchDBUtils.read(resolveFile(path));
-    }
-    static String stripComments(String json) {
-        Pattern pat = Pattern.compile("/\\*.*\\*/",Pattern.MULTILINE | Pattern.DOTALL);
-        return pat.matcher(json).replaceAll("");
     }
     
     protected void deleteIfExists(String db) throws Exception {

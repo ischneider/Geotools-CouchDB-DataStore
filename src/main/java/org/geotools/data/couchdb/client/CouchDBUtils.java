@@ -28,12 +28,12 @@ import com.vividsolutions.jts.geom.Polygon;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geojson.GeoJSONUtil;
 import org.geotools.geojson.geom.GeometryJSON;
+import org.geotools.geometry.jts.Geometries;
 import org.json.simple.JSONObject;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -157,39 +157,16 @@ public final class CouchDBUtils {
             builder.add(k.toString(), String.class);
         }
         String geomType = geom.get("type").toString();
-        Class clazz = geometryClass(geomType);
+        Class clazz = Geometries.getForName(geomType).getBinding();
         if (clazz == null) {
             throw new IOException("Unable to parse geometry type from " + geomType);
         }
         builder.add("geometry", clazz, (CoordinateReferenceSystem) null); // @todo find type from name?
         return builder.buildFeatureType();
     }
-    
-    // @todo surely this exists elsewhere (like DataUtilities)
-    public static Class geometryClass(String name) {
-        Class clazz = null;
-        if ("Geometry".equals(name)) {
-            clazz = Geometry.class;
-        } else if ("Point".equals(name)) {
-            clazz = Point.class;
-        } else if ("LineString".equals(name)) {
-            clazz = LineString.class;
-        } else if ("Polygon".equals(name)) {
-            clazz = Polygon.class;
-        } else if ("MultiPoint".equals(name)) {
-            clazz = MultiPoint.class;
-        } else if ("MultiLineString".equals(name)) {
-            clazz = MultiLineString.class;
-        } else if ("MultiPolygon".equals(name)) {
-            clazz = MultiPolygon.class;
-        } else if ("GeometryCollection".equals(name)) {
-            clazz = GeometryCollection.class;
-        }
-        return clazz;
-    }
 
     public static String stripComments(String json) {
-        Pattern pat = Pattern.compile("/\\*.*\\*/", Pattern.MULTILINE | Pattern.DOTALL);
+        Pattern pat = Pattern.compile("/\\*(?:.)*?\\*/", Pattern.MULTILINE | Pattern.DOTALL);
         return pat.matcher(json).replaceAll("");
     }
 
