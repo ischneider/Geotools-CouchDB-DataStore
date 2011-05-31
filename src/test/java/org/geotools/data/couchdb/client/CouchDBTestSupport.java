@@ -79,10 +79,6 @@ public class CouchDBTestSupport {
     protected String resolveContent(String path) throws FileNotFoundException {
         return CouchDBUtils.read(resolveFile(path));
     }
-    static String stripComments(String json) {
-        Pattern pat = Pattern.compile("/\\*.*\\*/",Pattern.MULTILINE | Pattern.DOTALL);
-        return pat.matcher(json).replaceAll("");
-    }
     
     protected void deleteIfExists(String db) throws Exception {
         List<String> databaseNames = client.getDatabaseNames();

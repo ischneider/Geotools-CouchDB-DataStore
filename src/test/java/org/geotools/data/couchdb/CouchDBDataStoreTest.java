@@ -60,7 +60,7 @@ public class CouchDBDataStoreTest extends CouchDBTestSupport {
     @AfterClass
     public static void tearDownClass() throws Exception {
         if (db != null) {
-            //db.delete();
+            db.delete();
         }
     }
     
