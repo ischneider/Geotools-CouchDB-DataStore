@@ -42,6 +42,15 @@ public final class CouchDBResponse {
         
         boolean err = !isHttpOK();
         
+        InputStream response = request.getResponseBodyAsStream();
+        if (err) {
+            if (exception != null) {
+                throw new IOException("HTTP error",exception);
+            }
+            if (response == null) {
+                throw new IOException("HTTP error : " + result);
+            }
+        }
         json = JSONValue.parse(new InputStreamReader(request.getResponseBodyAsStream()));
         if (err) {
             isArray = false;

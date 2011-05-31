@@ -30,8 +30,9 @@ public class CouchDBException extends Exception {
     
     public IOException wrap() throws IOException {
         IOException ex = new IOException(getMessage());
+        ex.setStackTrace(getStackTrace());
         if (getCause() != null) {
-            ex.setStackTrace(ex.getStackTrace());
+            ex.initCause(getCause());
         }
         throw ex;
     }

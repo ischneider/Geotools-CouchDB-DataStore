@@ -16,6 +16,8 @@
  */
 package org.geotools.data.couchdb;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.geotools.data.couchdb.client.CouchDBTestSupport;
 import org.geotools.data.couchdb.client.CouchDBConnectionTest;
 import org.geotools.data.couchdb.client.CouchDBUtils;
@@ -23,6 +25,8 @@ import org.geotools.data.couchdb.client.CouchDBConnection;
 import org.geotools.data.store.ContentFeatureCollection;
 import org.junit.After;
 import java.io.IOException;
+import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import org.geotools.data.FeatureReader;
@@ -30,7 +34,6 @@ import org.geotools.data.Query;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.data.store.ContentFeatureStore;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.filter.Filter;
 import org.geotools.geojson.feature.FeatureJSON;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -77,6 +80,29 @@ public class CouchDBDataStoreTest extends CouchDBTestSupport {
     
     @After
     public void tearDown() throws IOException {
+    }
+    
+    @Test
+    public void testBrokenDB() {
+        store.setDatabaseName("nonexistent");
+        try {
+            store.getFeatureSource("foo");
+            fail("expected exception");
+        } catch (IOException ex) {
+            assertEquals("Unable to open DB 'nonexistent',not_found,no_db_file", ex.getMessage());
+        }
+    }
+    
+    @Test
+    public void testBrokenHost() {
+        store.setCouchURL("http://thisshouldnotexistandifitdoesihateyou.org");
+        try {
+            store.getFeatureSource("foo");
+            fail("expected exception");
+        } catch (IOException ex) {
+            assertEquals("HTTP error", ex.getMessage());
+            assertTrue(ex.getCause() instanceof UnknownHostException);
+        }
     }
 
     @Test
@@ -162,7 +188,14 @@ public class CouchDBDataStoreTest extends CouchDBTestSupport {
         ContentFeatureStore featureStore = (ContentFeatureStore) store.getFeatureSource("gttestdb.countries");
         featureStore.addFeatures(Collections.singleton(feature));
         
+        // single add case
         ContentFeatureCollection features = featureStore.getFeatures();
         assertEquals(2,features.size());
+        
+        // double add (we can add the same features repeatedly at the moment 
+        // since the id is opaque to the feature
+        featureStore.addFeatures(Arrays.asList(feature,feature));
+        assertEquals(4,features.size());
+
     }
 }
