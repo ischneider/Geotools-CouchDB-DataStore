@@ -2,20 +2,22 @@
  * CouchDB/Geocouch desgin document
  */
 {
+    "funcs" : {
+        "commonjs" : {
+            "jsonp" : "exports.jsonp = function(req,resp) { var cb = req.query.callback; if (cb) send(cb + '('); send(resp); if (cb) send(');'); send('\\n')}"
+        }
+    },
     "spatial": {
-        "counties": "function(doc) { if (doc.featureClass == 'counties' && doc.geometry) { emit(doc.geometry,doc) } }",
-        "countries": "function(doc) { if (doc.featureClass == 'countries' && doc.geometry) { emit(doc.geometry,doc) } }"
+        "ids" : "function(doc) { if (doc.type == 'Feature') { emit(doc.geometry,doc._id) } }",
+        "geojson": "function(doc) { if (doc.type == 'Feature') { emit(doc.geometry,doc) } }"
     },
     "lists" : {
-        "ids": "function(head,req) { var row; while (row= getRow()) { send(row.value + '\n');} }",
-        "query": "function(head,req) { var row, re = new RegExp(req.query.fval), attr = req.query.fname; while (row= getRow()) { if (re.exec(row.value.properties[attr])) send(row.value._id + '\\n');} }"
+        "ids" : "function(head,req) { var row, ids = [], lib=require('funcs/commonjs/jsonp'); while (row= getRow()) { ids.push(row.id);} lib.jsonp(req,toJSON(ids));}",
+        "query": "function(head,req) { var row, re = new RegExp(req.query.fval), attr = req.query.fname, ids = [], lib=require('funcs/commonjs/jsonp'); while (row= getRow()) { if (re.exec(row.value.properties[attr])) ids.push(row.id);} lib.jsonp(req,toJSON(ids));}"
     },
     "views": {
-        "counties": {
-            "map": "function(doc) { if (doc.featureClass == 'counties' && doc.geometry)  emit(doc._id, doc) }"
-        },
-        "countries": {
-            "map": "function(doc) { if (doc.featureClass == 'countries' && doc.geometry)  emit(doc._id, doc) }"
+        "features": {
+            "map": "function(doc) { if (doc.type == 'Feature')  emit(doc._id, doc) }"
         }
     }
 }
