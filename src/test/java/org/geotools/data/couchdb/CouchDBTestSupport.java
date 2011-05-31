@@ -14,25 +14,24 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.data.couchdb.client;
+package org.geotools.data.couchdb;
 
+import java.io.IOException;
 import java.util.Properties;
-import org.geotools.data.couchdb.client.CouchDBUtils;
-import org.geotools.data.couchdb.client.CouchDBClient;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import java.io.FileReader;
-import java.util.regex.Pattern;
 import java.io.FileNotFoundException;
 import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotools.TestData;
+import org.geotools.data.couchdb.client.CouchDBClient;
+import org.geotools.data.couchdb.client.CouchDBUtils;
 import org.geotools.test.OnlineTestSupport;
 import org.geotools.util.logging.Logging;
 import org.json.simple.JSONValue;
 import org.junit.After;
-import org.junit.Before;
 import static org.junit.Assert.*;
 
 /**
@@ -61,8 +60,8 @@ public class CouchDBTestSupport extends OnlineTestSupport {
         Logger.getLogger("").getHandlers()[0].setLevel(on ? Level.FINEST : Level.INFO);
     }
     
-    protected File resolveFile(String path) {
-        return new File("src/test/resources/org/geotools/data/couchdb/" + path);
+    protected File resolveFile(String path) throws IOException {
+        return TestData.file(CouchDBTestSupport.class,path);
     }
     
     protected JSONArray loadJSON(String path,String featureClass) throws Exception {
@@ -79,7 +78,7 @@ public class CouchDBTestSupport extends OnlineTestSupport {
         return features;
     }
     
-    protected String resolveContent(String path) throws FileNotFoundException {
+    protected String resolveContent(String path) throws IOException {
         return CouchDBUtils.read(resolveFile(path));
     }
     

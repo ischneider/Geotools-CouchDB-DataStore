@@ -16,6 +16,7 @@
  */
 package org.geotools.data.couchdb.client;
 
+import org.geotools.data.couchdb.CouchDBTestSupport;
 import org.junit.Before;
 import java.util.List;
 import org.junit.Test;

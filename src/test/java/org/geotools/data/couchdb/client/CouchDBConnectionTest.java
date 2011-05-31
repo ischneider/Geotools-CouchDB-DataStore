@@ -16,6 +16,7 @@
  */
 package org.geotools.data.couchdb.client;
 
+import org.geotools.data.couchdb.CouchDBTestSupport;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

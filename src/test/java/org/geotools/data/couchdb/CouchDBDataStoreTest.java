@@ -18,7 +18,6 @@ package org.geotools.data.couchdb;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.geotools.data.couchdb.client.CouchDBTestSupport;
 import org.geotools.data.couchdb.client.CouchDBConnectionTest;
 import org.geotools.data.couchdb.client.CouchDBUtils;
 import org.geotools.data.couchdb.client.CouchDBConnection;
