@@ -34,7 +34,7 @@ import org.opengis.feature.type.Name;
 
 /**
  *
- * @author Ian Schneider
+ * @author Ian Schneider (OpenGeo)
  */
 public class CouchDBDataStore extends ContentDataStore {
 

@@ -2,7 +2,7 @@
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
  *
- *    (C) 2004-2010, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2004-2011, Open Source Geospatial Foundation (OSGeo)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -34,7 +34,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * Handle CouchDB results.
- * @author Ian Schneider
+ * @author Ian Schneider (OpenGeo)
  */
 class CouchDBFeatureReader implements FeatureReader<SimpleFeatureType, SimpleFeature> {
 

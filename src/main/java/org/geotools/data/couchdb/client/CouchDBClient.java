@@ -2,7 +2,7 @@
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
  *
- *    (C) 2004-2010, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2004-2011, Open Source Geospatial Foundation (OSGeo)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -59,7 +59,7 @@ import org.json.simple.JSONArray;
  * libraries
  * 
  * @todo thread safety requirements?
- * @author Ian Schneider
+ * @author Ian Schneider (OpenGeo)
  */
 public class CouchDBClient {
     private static final String DEFAULT_CHARSET = "UTF-8";
@@ -278,6 +278,8 @@ public class CouchDBClient {
         }
     }
     
+    // this should support the concept of parent component, otherwise
+    // children components must use their parent uri function ...
     static abstract class Component {
         protected final String root;
         protected final CouchDBClient client;

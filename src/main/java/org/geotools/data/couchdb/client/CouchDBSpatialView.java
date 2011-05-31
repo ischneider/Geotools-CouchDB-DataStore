@@ -22,7 +22,7 @@ import org.json.simple.JSONObject;
 
 /**
  *
- * @author Ian Schneider
+ * @author Ian Schneider (OpenGeo)
  */
 public class CouchDBSpatialView extends CouchDBViewSupport {
 

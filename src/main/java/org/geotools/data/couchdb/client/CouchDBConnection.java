@@ -2,7 +2,7 @@
  *    GeoTools - The Open Source Java GIS Toolkit
  *    http://geotools.org
  *
- *    (C) 2004-2010, Open Source Geospatial Foundation (OSGeo)
+ *    (C) 2004-2011, Open Source Geospatial Foundation (OSGeo)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@ import org.json.simple.JSONObject;
 
 /**
  * Represents a connection to an individual database.
- * @author Ian Schneider
+ * @author Ian Schneider (OpenGeo)
  */
 public class CouchDBConnection extends CouchDBClient.Component {
     private static final String PATH_DESIGN_MAIN = "_design/main";
